@@ -10,6 +10,7 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
    - Uglify JS for production
    - Separate `frontend.js` and `admin.js`
    - Extracted CSS/LESS to separate `frontend.css` and `admin.css` files.
+   - Auto reloading with Browser with **Browsersync** *([config](config.json))*
  - [Vue](https://vuejs.org/) and [Vue Router](https://router.vuejs.org/en/)
  - Frontend (shortcode) and Backend starter app
  - Modern PHP codebase with [namespace](http://php.net/manual/en/language.namespaces.php) support

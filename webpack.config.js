@@ -4,6 +4,9 @@ const package = require('./package.json');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin');
+const BrowserSyncPlugin = require( 'browser-sync-webpack-plugin' );
+
+const config = require( './config.json' );
 
 // Naming and path settings
 var appName = 'app';
@@ -36,6 +39,17 @@ plugins.push(new webpack.optimize.CommonsChunkPlugin({
     name: 'vendor',
     minChunks: ({ resource }) => /node_modules/.test(resource),
 }));
+
+plugins.push(new BrowserSyncPlugin( {
+    proxy: {
+        target: config.proxyURL
+    },
+    files: [
+        '**/*.php'
+    ],
+    cors: true,
+    reloadDelay: 0
+} ));
 
 // Generate a 'manifest' chunk to be inlined in the HTML template
 // plugins.push(new webpack.optimize.CommonsChunkPlugin('manifest'));
