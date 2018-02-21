@@ -17,18 +17,19 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
  
 ## 🚚 Running 
 
-1. Clone this repository
-1. Run `npm install`
-1. To start developing, run `npm run dev` 🤘
-1. For production build, run `npm run build` 👍
+1. Clone this repository in your plugins folder
+1. Activate the plugin
 
 ## 👨‍💻 Post Installation
 
 1. The name of the plugin class is `Base_Plugin`, change the class name with your desired class name.
-2. Replace the PHP namespace `App` with your desired name.
-3. Replace `baseplugin` or `BASEPLUGIN` reference in files.
+1. Replace the PHP namespace `App` with your desired name.
+1. Replace `baseplugin` or `BASEPLUGIN` reference in files.
+1. Run `npm install`
+1. To start developing, run `npm run dev` 🤘
+1. For production build, run `npm run build` 👍
 
-## Example 
+## 🎁 Preview 
 
 ![screenshot](http://tareq.in/owiyZI+)
 
