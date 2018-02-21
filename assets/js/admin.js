@@ -37,6 +37,7 @@ pluginWebpack([0],[
 //
 
 /* harmony default export */ __webpack_exports__["a"] = ({
+
     name: 'Home',
 
     data() {

@@ -99,6 +99,12 @@ class Assets {
             'baseplugin-style' => [
                 'src' =>  BASEPLUGIN_ASSETS . '/css/style.css'
             ],
+            'baseplugin-frontend' => [
+                'src' =>  BASEPLUGIN_ASSETS . '/css/frontend.css'
+            ],
+            'baseplugin-admin' => [
+                'src' =>  BASEPLUGIN_ASSETS . '/css/admin.css'
+            ],
         ];
 
         return $styles;
