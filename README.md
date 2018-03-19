@@ -15,8 +15,8 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
  - Frontend (shortcode) and Backend starter app
  - Modern PHP codebase with [namespace](http://php.net/manual/en/language.namespaces.php) support
 
- 
-## 🚚 Running 
+
+## 🚚 Running
 
 1. Clone this repository in your plugins folder
 1. Activate the plugin
@@ -30,9 +30,13 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
 1. To start developing, run `npm run dev` 🤘
 1. For production build, run `npm run build` 👍
 
-## 🎁 Preview 
+## 🎁 Preview
 
 ![screenshot](http://tareq.in/owiyZI+)
+
+## ⛑ Extra Goodies
+
+ 1. [Vue List Table Component](https://github.com/tareq1988/vue-wp-list-table-component) - Helps you to build WordPress list tables easily.
 
 ## About
 
