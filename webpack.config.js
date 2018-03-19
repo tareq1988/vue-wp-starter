@@ -105,7 +105,7 @@ module.exports = {
 
     plugins,
 
-    module: {
+        module: {
         rules: [
             {
                 test: /\.js$/,
@@ -131,6 +131,10 @@ module.exports = {
                         loader: "less-loader"
                     }]
                 })
+            },
+            {
+                test: /\.css$/,
+                use: [ 'style-loader', 'css-loader' ]
             }
         ]
     },

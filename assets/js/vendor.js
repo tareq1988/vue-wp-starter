@@ -98,12 +98,11 @@
 /******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 37);
+/******/ 	return __webpack_require__(__webpack_require__.s = 41);
 /******/ })
 /************************************************************************/
-/******/ ({
-
-/***/ 0:
+/******/ ([
+/* 0 */
 /***/ (function(module, exports) {
 
 /* globals __VUE_SSR_CONTEXT__ */
@@ -212,8 +211,7 @@ module.exports = function normalizeComponent (
 
 
 /***/ }),
-
-/***/ 1:
+/* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11028,307 +11026,37 @@ Vue$3.compile = compileToFunctions;
 
 /* harmony default export */ __webpack_exports__["default"] = (Vue$3);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2), __webpack_require__(3), __webpack_require__(12).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3), __webpack_require__(2), __webpack_require__(14).setImmediate))
 
 /***/ }),
-
-/***/ 12:
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
-
-// DOM APIs, for completeness
-
-exports.setTimeout = function() {
-  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-};
-exports.setInterval = function() {
-  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-};
-exports.clearTimeout =
-exports.clearInterval = function(timeout) {
-  if (timeout) {
-    timeout.close();
-  }
-};
-
-function Timeout(id, clearFn) {
-  this._id = id;
-  this._clearFn = clearFn;
-}
-Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-Timeout.prototype.close = function() {
-  this._clearFn.call(window, this._id);
-};
-
-// Does not start the time, just sets up the members needed.
-exports.enroll = function(item, msecs) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = msecs;
-};
-
-exports.unenroll = function(item) {
-  clearTimeout(item._idleTimeoutId);
-  item._idleTimeout = -1;
-};
-
-exports._unrefActive = exports.active = function(item) {
-  clearTimeout(item._idleTimeoutId);
-
-  var msecs = item._idleTimeout;
-  if (msecs >= 0) {
-    item._idleTimeoutId = setTimeout(function onTimeout() {
-      if (item._onTimeout)
-        item._onTimeout();
-    }, msecs);
-  }
-};
-
-// setimmediate attaches itself to the global object
-__webpack_require__(13);
-// On some exotic environments, it's not clear which object `setimmeidate` was
-// able to install onto.  Search each possibility in the same order as the
-// `setimmediate` library.
-exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
-                       (typeof global !== "undefined" && global.setImmediate) ||
-                       (this && this.setImmediate);
-exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
-                         (typeof global !== "undefined" && global.clearImmediate) ||
-                         (this && this.clearImmediate);
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3)))
-
-/***/ }),
-
-/***/ 13:
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
-    "use strict";
-
-    if (global.setImmediate) {
-        return;
-    }
-
-    var nextHandle = 1; // Spec says greater than zero
-    var tasksByHandle = {};
-    var currentlyRunningATask = false;
-    var doc = global.document;
-    var registerImmediate;
-
-    function setImmediate(callback) {
-      // Callback can either be a function or a string
-      if (typeof callback !== "function") {
-        callback = new Function("" + callback);
-      }
-      // Copy function arguments
-      var args = new Array(arguments.length - 1);
-      for (var i = 0; i < args.length; i++) {
-          args[i] = arguments[i + 1];
-      }
-      // Store and register the task
-      var task = { callback: callback, args: args };
-      tasksByHandle[nextHandle] = task;
-      registerImmediate(nextHandle);
-      return nextHandle++;
-    }
-
-    function clearImmediate(handle) {
-        delete tasksByHandle[handle];
-    }
-
-    function run(task) {
-        var callback = task.callback;
-        var args = task.args;
-        switch (args.length) {
-        case 0:
-            callback();
-            break;
-        case 1:
-            callback(args[0]);
-            break;
-        case 2:
-            callback(args[0], args[1]);
-            break;
-        case 3:
-            callback(args[0], args[1], args[2]);
-            break;
-        default:
-            callback.apply(undefined, args);
-            break;
-        }
-    }
-
-    function runIfPresent(handle) {
-        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
-        // So if we're currently running a task, we'll need to delay this invocation.
-        if (currentlyRunningATask) {
-            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
-            // "too much recursion" error.
-            setTimeout(runIfPresent, 0, handle);
-        } else {
-            var task = tasksByHandle[handle];
-            if (task) {
-                currentlyRunningATask = true;
-                try {
-                    run(task);
-                } finally {
-                    clearImmediate(handle);
-                    currentlyRunningATask = false;
-                }
-            }
-        }
-    }
-
-    function installNextTickImplementation() {
-        registerImmediate = function(handle) {
-            process.nextTick(function () { runIfPresent(handle); });
-        };
-    }
-
-    function canUsePostMessage() {
-        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
-        // where `global.postMessage` means something completely different and can't be used for this purpose.
-        if (global.postMessage && !global.importScripts) {
-            var postMessageIsAsynchronous = true;
-            var oldOnMessage = global.onmessage;
-            global.onmessage = function() {
-                postMessageIsAsynchronous = false;
-            };
-            global.postMessage("", "*");
-            global.onmessage = oldOnMessage;
-            return postMessageIsAsynchronous;
-        }
-    }
-
-    function installPostMessageImplementation() {
-        // Installs an event handler on `global` for the `message` event: see
-        // * https://developer.mozilla.org/en/DOM/window.postMessage
-        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
-
-        var messagePrefix = "setImmediate$" + Math.random() + "$";
-        var onGlobalMessage = function(event) {
-            if (event.source === global &&
-                typeof event.data === "string" &&
-                event.data.indexOf(messagePrefix) === 0) {
-                runIfPresent(+event.data.slice(messagePrefix.length));
-            }
-        };
-
-        if (global.addEventListener) {
-            global.addEventListener("message", onGlobalMessage, false);
-        } else {
-            global.attachEvent("onmessage", onGlobalMessage);
-        }
-
-        registerImmediate = function(handle) {
-            global.postMessage(messagePrefix + handle, "*");
-        };
-    }
-
-    function installMessageChannelImplementation() {
-        var channel = new MessageChannel();
-        channel.port1.onmessage = function(event) {
-            var handle = event.data;
-            runIfPresent(handle);
-        };
-
-        registerImmediate = function(handle) {
-            channel.port2.postMessage(handle);
-        };
-    }
-
-    function installReadyStateChangeImplementation() {
-        var html = doc.documentElement;
-        registerImmediate = function(handle) {
-            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
-            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
-            var script = doc.createElement("script");
-            script.onreadystatechange = function () {
-                runIfPresent(handle);
-                script.onreadystatechange = null;
-                html.removeChild(script);
-                script = null;
-            };
-            html.appendChild(script);
-        };
-    }
-
-    function installSetTimeoutImplementation() {
-        registerImmediate = function(handle) {
-            setTimeout(runIfPresent, 0, handle);
-        };
-    }
-
-    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
-    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
-    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
-
-    // Don't get fooled by e.g. browserify environments.
-    if ({}.toString.call(global.process) === "[object process]") {
-        // For Node.js before 0.9
-        installNextTickImplementation();
-
-    } else if (canUsePostMessage()) {
-        // For non-IE10 modern browsers
-        installPostMessageImplementation();
-
-    } else if (global.MessageChannel) {
-        // For web workers, where supported
-        installMessageChannelImplementation();
-
-    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
-        // For IE 6–8
-        installReadyStateChangeImplementation();
-
-    } else {
-        // For older browsers
-        installSetTimeoutImplementation();
-    }
-
-    attachTo.setImmediate = setImmediate;
-    attachTo.clearImmediate = clearImmediate;
-}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
-
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(2)))
-
-/***/ }),
-
-/***/ 16:
+/* 2 */
 /***/ (function(module, exports) {
 
-/**
- * Translates the list format produced by css-loader into something
- * easier to manipulate.
- */
-module.exports = function listToStyles (parentId, list) {
-  var styles = []
-  var newStyles = {}
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i]
-    var id = item[0]
-    var css = item[1]
-    var media = item[2]
-    var sourceMap = item[3]
-    var part = {
-      id: parentId + ':' + i,
-      css: css,
-      media: media,
-      sourceMap: sourceMap
-    }
-    if (!newStyles[id]) {
-      styles.push(newStyles[id] = { id: id, parts: [part] })
-    } else {
-      newStyles[id].parts.push(part)
-    }
-  }
-  return styles
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
 }
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
 
 
 /***/ }),
-
-/***/ 2:
+/* 3 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -11518,128 +11246,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-
-/***/ 3:
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-
-/***/ 37:
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(1);
-module.exports = __webpack_require__(4);
-
-
-/***/ }),
-
-/***/ 39:
-/***/ (function(module, exports) {
-
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function(useSourceMap) {
-	var list = [];
-
-	// return the list of modules as css string
-	list.toString = function toString() {
-		return this.map(function (item) {
-			var content = cssWithMappingToString(item, useSourceMap);
-			if(item[2]) {
-				return "@media " + item[2] + "{" + content + "}";
-			} else {
-				return content;
-			}
-		}).join("");
-	};
-
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
-};
-
-function cssWithMappingToString(item, useSourceMap) {
-	var content = item[1] || '';
-	var cssMapping = item[3];
-	if (!cssMapping) {
-		return content;
-	}
-
-	if (useSourceMap && typeof btoa === 'function') {
-		var sourceMapping = toComment(cssMapping);
-		var sourceURLs = cssMapping.sources.map(function (source) {
-			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
-		});
-
-		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
-	}
-
-	return [content].join('\n');
-}
-
-// Adapted from convert-source-map (MIT)
-function toComment(sourceMap) {
-	// eslint-disable-next-line no-undef
-	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
-	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
-
-	return '/*# ' + data + ' */';
-}
-
-
-/***/ }),
-
-/***/ 4:
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14268,11 +13875,1621 @@ if (inBrowser && window.Vue) {
 
 /* harmony default export */ __webpack_exports__["default"] = (VueRouter);
 
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
+
+/***/ }),
+/* 5 */,
+/* 6 */,
+/* 7 */,
+/* 8 */,
+/* 9 */,
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony export (immutable) */ __webpack_exports__["install"] = install;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_ListTable_vue__ = __webpack_require__(33);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ListTable", function() { return __WEBPACK_IMPORTED_MODULE_0__components_ListTable_vue__["a"]; });
+
+
+// Install the components
+function install (Vue) {
+  Vue.component('ListTable', __WEBPACK_IMPORTED_MODULE_0__components_ListTable_vue__["a" /* default */])
+  /* -- Add more components here -- */
+}
+
+// Expose the components
+
+
+/* -- Plugin definition & Auto-install -- */
+/* You shouldn't have to modify the code below */
+
+// Plugin
+const plugin = {
+  /* eslint-disable no-undef */
+  install,
+}
+
+/* harmony default export */ __webpack_exports__["default"] = (__WEBPACK_IMPORTED_MODULE_0__components_ListTable_vue__["a" /* default */]);
+
+// Auto-install
+let GlobalVue = null
+if (typeof window !== 'undefined') {
+  GlobalVue = window.Vue
+} else if (typeof global !== 'undefined') {
+  GlobalVue = global.Vue
+}
+if (GlobalVue) {
+  GlobalVue.use(plugin)
+}
+
 /* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
 
 /***/ }),
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-/***/ 40:
+"use strict";
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["a"] = ({
+
+  name: 'ListTable',
+
+  props: {
+    columns: {
+      type: Object,
+      required: true,
+      default: {}
+    },
+    rows: {
+      type: Array, // String, Number, Boolean, Function, Object, Array
+      required: true,
+      default: []
+    },
+    index: {
+      type: String,
+      default: 'id'
+    },
+    showCb: {
+      type: Boolean,
+      default: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    actionColumn: {
+      type: String,
+      default: ''
+    },
+    actions: {
+      type: Array,
+      required: false,
+      default: []
+    },
+    bulkActions: {
+      type: Array,
+      required: false,
+      default: []
+    },
+    tableClass: {
+      type: String,
+      default: 'wp-list-table widefat fixed striped'
+    },
+    notFound: {
+      type: String,
+      default: 'No items found.'
+    },
+    totalItems: {
+      type: Number,
+      default: 0
+    },
+    totalPages: {
+      type: Number,
+      default: 1
+    },
+    perPage: {
+      type: Number,
+      default: 20
+    },
+    currentPage: {
+      type: Number,
+      default: 1
+    },
+    sortBy: {
+      type: String,
+      default: null
+    },
+    sortOrder: {
+      type: String,
+      default: "asc"
+    }
+  },
+
+  data: function data() {
+    return {
+      bulkLocal: '-1',
+      checkedItems: []
+    };
+  },
+
+
+  computed: {
+    hasActions: function hasActions() {
+      return this.actions.length > 0;
+    },
+    hasBulkActions: function hasBulkActions() {
+      return this.bulkActions.length > 0;
+    },
+    itemsTotal: function itemsTotal() {
+      return this.totalItems || this.rows.length;
+    },
+    hasPagination: function hasPagination() {
+      return this.itemsTotal > this.perPage;
+    },
+    disableFirst: function disableFirst() {
+      if (this.currentPage === 1 || this.currentPage === 2) {
+        return true;
+      }
+
+      return false;
+    },
+    disablePrev: function disablePrev() {
+      if (this.currentPage === 1) {
+        return true;
+      }
+
+      return false;
+    },
+    disableNext: function disableNext() {
+      if (this.currentPage === this.totalPages) {
+        return true;
+      }
+
+      return false;
+    },
+    disableLast: function disableLast() {
+      if (this.currentPage === this.totalPages || this.currentPage == this.totalPages - 1) {
+        return true;
+      }
+
+      return false;
+    },
+    colspan: function colspan() {
+      var columns = Object.keys(this.columns).length;
+
+      if (this.showCb) {
+        columns += 1;
+      }
+
+      return columns;
+    },
+
+
+    selectAll: {
+
+      get: function get() {
+        if (!this.rows.length) {
+          return false;
+        }
+
+        return this.rows ? this.checkedItems.length == this.rows.length : false;
+      },
+
+      set: function set(value) {
+        var selected = [],
+            self = this;
+
+        if (value) {
+          this.rows.forEach(function (item) {
+            if (item[self.index] !== undefined) {
+              selected.push(item[self.index]);
+            } else {
+              selected.push(item.id);
+            }
+          });
+        }
+
+        this.checkedItems = selected;
+      }
+    }
+  },
+
+  methods: {
+    hideActionSeparator: function hideActionSeparator(action) {
+      return action === this.actions[this.actions.length - 1].key;
+    },
+    actionClicked: function actionClicked(action, row) {
+      this.$emit('action:click', action, row);
+    },
+    goToPage: function goToPage(page) {
+      this.$emit('pagination', page);
+    },
+    goToCustomPage: function goToCustomPage(event) {
+      var page = parseInt(event.target.value);
+
+      if (!isNaN(page) && page > 0 && page <= this.totalPages) {
+        this.$emit('pagination', page);
+      }
+    },
+    handleBulkAction: function handleBulkAction() {
+      if (this.bulkLocal === '-1') {
+        return;
+      }
+
+      this.$emit('bulk:click', this.bulkLocal, this.checkedItems);
+    },
+    isSortable: function isSortable(column) {
+      if (column.hasOwnProperty('sortable') && column.sortable === true) {
+        return true;
+      }
+
+      return false;
+    },
+    isSorted: function isSorted(column) {
+      return column === this.sortBy;
+    },
+    handleSortBy: function handleSortBy(column) {
+      var order = this.sortOrder === 'asc' ? 'desc' : 'asc';
+
+      this.$emit('sort', column, order);
+    }
+  }
+});
+
+/***/ }),
+/* 12 */,
+/* 13 */,
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var apply = Function.prototype.apply;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) {
+  if (timeout) {
+    timeout.close();
+  }
+};
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// setimmediate attaches itself to the global object
+__webpack_require__(15);
+// On some exotic environments, it's not clear which object `setimmeidate` was
+// able to install onto.  Search each possibility in the same order as the
+// `setimmediate` library.
+exports.setImmediate = (typeof self !== "undefined" && self.setImmediate) ||
+                       (typeof global !== "undefined" && global.setImmediate) ||
+                       (this && this.setImmediate);
+exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
+                         (typeof global !== "undefined" && global.clearImmediate) ||
+                         (this && this.clearImmediate);
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+
+/***/ }),
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
+    "use strict";
+
+    if (global.setImmediate) {
+        return;
+    }
+
+    var nextHandle = 1; // Spec says greater than zero
+    var tasksByHandle = {};
+    var currentlyRunningATask = false;
+    var doc = global.document;
+    var registerImmediate;
+
+    function setImmediate(callback) {
+      // Callback can either be a function or a string
+      if (typeof callback !== "function") {
+        callback = new Function("" + callback);
+      }
+      // Copy function arguments
+      var args = new Array(arguments.length - 1);
+      for (var i = 0; i < args.length; i++) {
+          args[i] = arguments[i + 1];
+      }
+      // Store and register the task
+      var task = { callback: callback, args: args };
+      tasksByHandle[nextHandle] = task;
+      registerImmediate(nextHandle);
+      return nextHandle++;
+    }
+
+    function clearImmediate(handle) {
+        delete tasksByHandle[handle];
+    }
+
+    function run(task) {
+        var callback = task.callback;
+        var args = task.args;
+        switch (args.length) {
+        case 0:
+            callback();
+            break;
+        case 1:
+            callback(args[0]);
+            break;
+        case 2:
+            callback(args[0], args[1]);
+            break;
+        case 3:
+            callback(args[0], args[1], args[2]);
+            break;
+        default:
+            callback.apply(undefined, args);
+            break;
+        }
+    }
+
+    function runIfPresent(handle) {
+        // From the spec: "Wait until any invocations of this algorithm started before this one have completed."
+        // So if we're currently running a task, we'll need to delay this invocation.
+        if (currentlyRunningATask) {
+            // Delay by doing a setTimeout. setImmediate was tried instead, but in Firefox 7 it generated a
+            // "too much recursion" error.
+            setTimeout(runIfPresent, 0, handle);
+        } else {
+            var task = tasksByHandle[handle];
+            if (task) {
+                currentlyRunningATask = true;
+                try {
+                    run(task);
+                } finally {
+                    clearImmediate(handle);
+                    currentlyRunningATask = false;
+                }
+            }
+        }
+    }
+
+    function installNextTickImplementation() {
+        registerImmediate = function(handle) {
+            process.nextTick(function () { runIfPresent(handle); });
+        };
+    }
+
+    function canUsePostMessage() {
+        // The test against `importScripts` prevents this implementation from being installed inside a web worker,
+        // where `global.postMessage` means something completely different and can't be used for this purpose.
+        if (global.postMessage && !global.importScripts) {
+            var postMessageIsAsynchronous = true;
+            var oldOnMessage = global.onmessage;
+            global.onmessage = function() {
+                postMessageIsAsynchronous = false;
+            };
+            global.postMessage("", "*");
+            global.onmessage = oldOnMessage;
+            return postMessageIsAsynchronous;
+        }
+    }
+
+    function installPostMessageImplementation() {
+        // Installs an event handler on `global` for the `message` event: see
+        // * https://developer.mozilla.org/en/DOM/window.postMessage
+        // * http://www.whatwg.org/specs/web-apps/current-work/multipage/comms.html#crossDocumentMessages
+
+        var messagePrefix = "setImmediate$" + Math.random() + "$";
+        var onGlobalMessage = function(event) {
+            if (event.source === global &&
+                typeof event.data === "string" &&
+                event.data.indexOf(messagePrefix) === 0) {
+                runIfPresent(+event.data.slice(messagePrefix.length));
+            }
+        };
+
+        if (global.addEventListener) {
+            global.addEventListener("message", onGlobalMessage, false);
+        } else {
+            global.attachEvent("onmessage", onGlobalMessage);
+        }
+
+        registerImmediate = function(handle) {
+            global.postMessage(messagePrefix + handle, "*");
+        };
+    }
+
+    function installMessageChannelImplementation() {
+        var channel = new MessageChannel();
+        channel.port1.onmessage = function(event) {
+            var handle = event.data;
+            runIfPresent(handle);
+        };
+
+        registerImmediate = function(handle) {
+            channel.port2.postMessage(handle);
+        };
+    }
+
+    function installReadyStateChangeImplementation() {
+        var html = doc.documentElement;
+        registerImmediate = function(handle) {
+            // Create a <script> element; its readystatechange event will be fired asynchronously once it is inserted
+            // into the document. Do so, thus queuing up the task. Remember to clean up once it's been called.
+            var script = doc.createElement("script");
+            script.onreadystatechange = function () {
+                runIfPresent(handle);
+                script.onreadystatechange = null;
+                html.removeChild(script);
+                script = null;
+            };
+            html.appendChild(script);
+        };
+    }
+
+    function installSetTimeoutImplementation() {
+        registerImmediate = function(handle) {
+            setTimeout(runIfPresent, 0, handle);
+        };
+    }
+
+    // If supported, we should attach to the prototype of global, since that is where setTimeout et al. live.
+    var attachTo = Object.getPrototypeOf && Object.getPrototypeOf(global);
+    attachTo = attachTo && attachTo.setTimeout ? attachTo : global;
+
+    // Don't get fooled by e.g. browserify environments.
+    if ({}.toString.call(global.process) === "[object process]") {
+        // For Node.js before 0.9
+        installNextTickImplementation();
+
+    } else if (canUsePostMessage()) {
+        // For non-IE10 modern browsers
+        installPostMessageImplementation();
+
+    } else if (global.MessageChannel) {
+        // For web workers, where supported
+        installMessageChannelImplementation();
+
+    } else if (doc && "onreadystatechange" in doc.createElement("script")) {
+        // For IE 6–8
+        installReadyStateChangeImplementation();
+
+    } else {
+        // For older browsers
+        installSetTimeoutImplementation();
+    }
+
+    attachTo.setImmediate = setImmediate;
+    attachTo.clearImmediate = clearImmediate;
+}(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(3)))
+
+/***/ }),
+/* 16 */,
+/* 17 */,
+/* 18 */,
+/* 19 */,
+/* 20 */,
+/* 21 */,
+/* 22 */,
+/* 23 */,
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_loader_vue_loader_lib_selector_type_script_index_0_ListTable_vue__ = __webpack_require__(11);
+/* unused harmony namespace reexport */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__vue_loader_lib_template_compiler_index_id_data_v_2562096c_hasScoped_false_buble_transforms_vue_loader_lib_selector_type_template_index_0_ListTable_vue__ = __webpack_require__(35);
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(34)
+}
+var normalizeComponent = __webpack_require__(0)
+/* script */
+
+
+/* template */
+
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __WEBPACK_IMPORTED_MODULE_0__babel_loader_vue_loader_lib_selector_type_script_index_0_ListTable_vue__["a" /* default */],
+  __WEBPACK_IMPORTED_MODULE_1__vue_loader_lib_template_compiler_index_id_data_v_2562096c_hasScoped_false_buble_transforms_vue_loader_lib_selector_type_template_index_0_ListTable_vue__["a" /* default */],
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "node_modules/vue-wp-list-table/src/components/ListTable.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2562096c", Component.options)
+  } else {
+    hotAPI.reload("data-v-2562096c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+/* harmony default export */ __webpack_exports__["a"] = (Component.exports);
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 35 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { class: { "table-loading": _vm.loading } }, [
+    _vm.loading
+      ? _c("div", { staticClass: "table-loader-wrap" }, [_vm._m(0)])
+      : _vm._e(),
+    _vm._v(" "),
+    _c("div", { staticClass: "tablenav top" }, [
+      _vm.hasBulkActions
+        ? _c("div", { staticClass: "alignleft actions bulkactions" }, [
+            _c(
+              "label",
+              {
+                staticClass: "screen-reader-text",
+                attrs: { for: "bulk-action-selector-top" }
+              },
+              [_vm._v("Select bulk action")]
+            ),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.bulkLocal,
+                    expression: "bulkLocal"
+                  }
+                ],
+                attrs: { name: "action", id: "bulk-action-selector-top" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.bulkLocal = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _c("option", { attrs: { value: "-1" } }, [
+                  _vm._v("Bulk Actions")
+                ]),
+                _vm._v(" "),
+                _vm._l(_vm.bulkActions, function(action) {
+                  return _c("option", { domProps: { value: action.key } }, [
+                    _vm._v(_vm._s(action.label))
+                  ])
+                })
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "button action",
+                attrs: { disabled: !_vm.checkedItems.length },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    _vm.handleBulkAction($event)
+                  }
+                }
+              },
+              [_vm._v("Apply")]
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c("div", { staticClass: "alignleft actions" }, [_vm._t("filters")], 2),
+      _vm._v(" "),
+      _c("div", { staticClass: "tablenav-pages" }, [
+        _c("span", { staticClass: "displaying-num" }, [
+          _vm._v(_vm._s(_vm.itemsTotal) + " items")
+        ]),
+        _vm._v(" "),
+        _vm.hasPagination
+          ? _c("span", { staticClass: "pagination-links" }, [
+              _vm.disableFirst
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("«")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "first-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(1)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("«")
+                      ])
+                    ]
+                  ),
+              _vm._v(" "),
+              _vm.disablePrev
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("‹")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "prev-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(_vm.currentPage - 1)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("‹")
+                      ])
+                    ]
+                  ),
+              _vm._v(" "),
+              _c("span", { staticClass: "paging-input" }, [
+                _c("span", { staticClass: "tablenav-paging-text" }, [
+                  _c("input", {
+                    staticClass: "current-page",
+                    attrs: {
+                      type: "text",
+                      name: "paged",
+                      "aria-describedby": "table-paging",
+                      size: "1"
+                    },
+                    domProps: { value: _vm.currentPage },
+                    on: {
+                      keyup: function($event) {
+                        if (
+                          !("button" in $event) &&
+                          _vm._k($event.keyCode, "enter", 13, $event.key)
+                        ) {
+                          return null
+                        }
+                        _vm.goToCustomPage($event)
+                      }
+                    }
+                  }),
+                  _vm._v(" of\n            "),
+                  _c("span", { staticClass: "total-pages" }, [
+                    _vm._v(_vm._s(_vm.totalPages))
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _vm.disableNext
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("›")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "next-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(_vm.currentPage + 1)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("›")
+                      ])
+                    ]
+                  ),
+              _vm._v(" "),
+              _vm.disableLast
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("»")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "last-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(_vm.totalPages)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("»")
+                      ])
+                    ]
+                  )
+            ])
+          : _vm._e()
+      ])
+    ]),
+    _vm._v(" "),
+    _c("table", { class: _vm.tableClass }, [
+      _c("thead", [
+        _c(
+          "tr",
+          [
+            _vm.showCb
+              ? _c(
+                  "td",
+                  { staticClass: "manage-column column-cb check-column" },
+                  [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.selectAll,
+                          expression: "selectAll"
+                        }
+                      ],
+                      attrs: { type: "checkbox" },
+                      domProps: {
+                        checked: Array.isArray(_vm.selectAll)
+                          ? _vm._i(_vm.selectAll, null) > -1
+                          : _vm.selectAll
+                      },
+                      on: {
+                        change: function($event) {
+                          var $$a = _vm.selectAll,
+                            $$el = $event.target,
+                            $$c = $$el.checked ? true : false
+                          if (Array.isArray($$a)) {
+                            var $$v = null,
+                              $$i = _vm._i($$a, $$v)
+                            if ($$el.checked) {
+                              $$i < 0 && (_vm.selectAll = $$a.concat([$$v]))
+                            } else {
+                              $$i > -1 &&
+                                (_vm.selectAll = $$a
+                                  .slice(0, $$i)
+                                  .concat($$a.slice($$i + 1)))
+                            }
+                          } else {
+                            _vm.selectAll = $$c
+                          }
+                        }
+                      }
+                    })
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm._l(_vm.columns, function(value, key) {
+              return _c(
+                "th",
+                {
+                  class: [
+                    "column",
+                    key,
+                    { sortable: _vm.isSortable(value) },
+                    { sorted: _vm.isSorted(key) },
+                    { asc: _vm.isSorted(key) && _vm.sortOrder === "asc" },
+                    { desc: _vm.isSorted(key) && _vm.sortOrder === "desc" }
+                  ]
+                },
+                [
+                  !_vm.isSortable(value)
+                    ? [
+                        _vm._v(
+                          "\n            " +
+                            _vm._s(value.label) +
+                            "\n          "
+                        )
+                      ]
+                    : _c(
+                        "a",
+                        {
+                          attrs: { href: "#" },
+                          on: {
+                            click: function($event) {
+                              $event.preventDefault()
+                              _vm.handleSortBy(key)
+                            }
+                          }
+                        },
+                        [
+                          _c("span", [_vm._v(_vm._s(value.label))]),
+                          _vm._v(" "),
+                          _c("span", { staticClass: "sorting-indicator" })
+                        ]
+                      )
+                ],
+                2
+              )
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _c("tfoot", [
+        _c(
+          "tr",
+          [
+            _vm.showCb
+              ? _c(
+                  "td",
+                  { staticClass: "manage-column column-cb check-column" },
+                  [
+                    _c("input", {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.selectAll,
+                          expression: "selectAll"
+                        }
+                      ],
+                      attrs: { type: "checkbox" },
+                      domProps: {
+                        checked: Array.isArray(_vm.selectAll)
+                          ? _vm._i(_vm.selectAll, null) > -1
+                          : _vm.selectAll
+                      },
+                      on: {
+                        change: function($event) {
+                          var $$a = _vm.selectAll,
+                            $$el = $event.target,
+                            $$c = $$el.checked ? true : false
+                          if (Array.isArray($$a)) {
+                            var $$v = null,
+                              $$i = _vm._i($$a, $$v)
+                            if ($$el.checked) {
+                              $$i < 0 && (_vm.selectAll = $$a.concat([$$v]))
+                            } else {
+                              $$i > -1 &&
+                                (_vm.selectAll = $$a
+                                  .slice(0, $$i)
+                                  .concat($$a.slice($$i + 1)))
+                            }
+                          } else {
+                            _vm.selectAll = $$c
+                          }
+                        }
+                      }
+                    })
+                  ]
+                )
+              : _vm._e(),
+            _vm._v(" "),
+            _vm._l(_vm.columns, function(value, key) {
+              return _c("th", { class: ["column", key] }, [
+                _vm._v(_vm._s(value.label))
+              ])
+            })
+          ],
+          2
+        )
+      ]),
+      _vm._v(" "),
+      _c(
+        "tbody",
+        [
+          _vm.rows.length
+            ? _vm._l(_vm.rows, function(row) {
+                return _c(
+                  "tr",
+                  { key: row[_vm.index] },
+                  [
+                    _vm.showCb
+                      ? _c(
+                          "th",
+                          {
+                            staticClass: "check-column",
+                            attrs: { scope: "row" }
+                          },
+                          [
+                            _c("input", {
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.checkedItems,
+                                  expression: "checkedItems"
+                                }
+                              ],
+                              attrs: { type: "checkbox", name: "item[]" },
+                              domProps: {
+                                value: row[_vm.index],
+                                checked: Array.isArray(_vm.checkedItems)
+                                  ? _vm._i(_vm.checkedItems, row[_vm.index]) >
+                                    -1
+                                  : _vm.checkedItems
+                              },
+                              on: {
+                                change: function($event) {
+                                  var $$a = _vm.checkedItems,
+                                    $$el = $event.target,
+                                    $$c = $$el.checked ? true : false
+                                  if (Array.isArray($$a)) {
+                                    var $$v = row[_vm.index],
+                                      $$i = _vm._i($$a, $$v)
+                                    if ($$el.checked) {
+                                      $$i < 0 &&
+                                        (_vm.checkedItems = $$a.concat([$$v]))
+                                    } else {
+                                      $$i > -1 &&
+                                        (_vm.checkedItems = $$a
+                                          .slice(0, $$i)
+                                          .concat($$a.slice($$i + 1)))
+                                    }
+                                  } else {
+                                    _vm.checkedItems = $$c
+                                  }
+                                }
+                              }
+                            })
+                          ]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _vm._l(_vm.columns, function(value, key) {
+                      return _c(
+                        "td",
+                        { class: ["column", key] },
+                        [
+                          _vm._t(
+                            key,
+                            [
+                              _vm._v(
+                                "\n              " +
+                                  _vm._s(row[key]) +
+                                  "\n            "
+                              )
+                            ],
+                            { row: row }
+                          ),
+                          _vm._v(" "),
+                          _vm.actionColumn === key && _vm.hasActions
+                            ? _c(
+                                "div",
+                                { staticClass: "row-actions" },
+                                [
+                                  _vm._t(
+                                    "row-actions",
+                                    _vm._l(_vm.actions, function(action) {
+                                      return _c(
+                                        "span",
+                                        { class: action.key },
+                                        [
+                                          _c(
+                                            "a",
+                                            {
+                                              attrs: { href: "#" },
+                                              on: {
+                                                click: function($event) {
+                                                  $event.preventDefault()
+                                                  _vm.actionClicked(
+                                                    action.key,
+                                                    row
+                                                  )
+                                                }
+                                              }
+                                            },
+                                            [_vm._v(_vm._s(action.label))]
+                                          ),
+                                          _vm._v(" "),
+                                          !_vm.hideActionSeparator(action.key)
+                                            ? [_vm._v(" | ")]
+                                            : _vm._e()
+                                        ],
+                                        2
+                                      )
+                                    }),
+                                    { row: row }
+                                  )
+                                ],
+                                2
+                              )
+                            : _vm._e()
+                        ],
+                        2
+                      )
+                    })
+                  ],
+                  2
+                )
+              })
+            : _c("tr", [
+                _c("td", { attrs: { colspan: _vm.colspan } }, [
+                  _vm._v(_vm._s(_vm.notFound))
+                ])
+              ])
+        ],
+        2
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "tablenav bottom" }, [
+      _vm.hasBulkActions
+        ? _c("div", { staticClass: "alignleft actions bulkactions" }, [
+            _c(
+              "label",
+              {
+                staticClass: "screen-reader-text",
+                attrs: { for: "bulk-action-selector-top" }
+              },
+              [_vm._v("Select bulk action")]
+            ),
+            _vm._v(" "),
+            _c(
+              "select",
+              {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.bulkLocal,
+                    expression: "bulkLocal"
+                  }
+                ],
+                attrs: { name: "action", id: "bulk-action-selector-top" },
+                on: {
+                  change: function($event) {
+                    var $$selectedVal = Array.prototype.filter
+                      .call($event.target.options, function(o) {
+                        return o.selected
+                      })
+                      .map(function(o) {
+                        var val = "_value" in o ? o._value : o.value
+                        return val
+                      })
+                    _vm.bulkLocal = $event.target.multiple
+                      ? $$selectedVal
+                      : $$selectedVal[0]
+                  }
+                }
+              },
+              [
+                _c("option", { attrs: { value: "-1" } }, [
+                  _vm._v("Bulk Actions")
+                ]),
+                _vm._v(" "),
+                _vm._l(_vm.bulkActions, function(action) {
+                  return _c("option", { domProps: { value: action.key } }, [
+                    _vm._v(_vm._s(action.label))
+                  ])
+                })
+              ],
+              2
+            ),
+            _vm._v(" "),
+            _c(
+              "button",
+              {
+                staticClass: "button action",
+                attrs: { disabled: !_vm.checkedItems.length },
+                on: {
+                  click: function($event) {
+                    $event.preventDefault()
+                    _vm.handleBulkAction($event)
+                  }
+                }
+              },
+              [_vm._v("Apply")]
+            )
+          ])
+        : _vm._e(),
+      _vm._v(" "),
+      _c("div", { staticClass: "tablenav-pages" }, [
+        _c("span", { staticClass: "displaying-num" }, [
+          _vm._v(_vm._s(_vm.itemsTotal) + " items")
+        ]),
+        _vm._v(" "),
+        _vm.hasPagination
+          ? _c("span", { staticClass: "pagination-links" }, [
+              _vm.disableFirst
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("«")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "first-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(1)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("«")
+                      ])
+                    ]
+                  ),
+              _vm._v(" "),
+              _vm.disablePrev
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("‹")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "prev-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(_vm.currentPage - 1)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("‹")
+                      ])
+                    ]
+                  ),
+              _vm._v(" "),
+              _c("span", { staticClass: "paging-input" }, [
+                _c("span", { staticClass: "tablenav-paging-text" }, [
+                  _vm._v(
+                    "\n            " +
+                      _vm._s(_vm.currentPage) +
+                      " of\n            "
+                  ),
+                  _c("span", { staticClass: "total-pages" }, [
+                    _vm._v(_vm._s(_vm.totalPages))
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _vm.disableNext
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("›")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "next-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(_vm.currentPage + 1)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("›")
+                      ])
+                    ]
+                  ),
+              _vm._v(" "),
+              _vm.disableLast
+                ? _c(
+                    "span",
+                    {
+                      staticClass: "tablenav-pages-navspan",
+                      attrs: { "aria-hidden": "true" }
+                    },
+                    [_vm._v("»")]
+                  )
+                : _c(
+                    "a",
+                    {
+                      staticClass: "last-page",
+                      attrs: { href: "#" },
+                      on: {
+                        click: function($event) {
+                          $event.preventDefault()
+                          _vm.goToPage(_vm.totalPages)
+                        }
+                      }
+                    },
+                    [
+                      _c("span", { attrs: { "aria-hidden": "true" } }, [
+                        _vm._v("»")
+                      ])
+                    ]
+                  )
+            ])
+          : _vm._e()
+      ])
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "table-loader-center" }, [
+      _c("div", { staticClass: "table-loader" }, [_vm._v("Loading")])
+    ])
+  }
+]
+render._withStripped = true
+var esExports = { render: render, staticRenderFns: staticRenderFns }
+/* harmony default export */ __webpack_exports__["a"] = (esExports);
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-2562096c", esExports)
+  }
+}
+
+/***/ }),
+/* 36 */,
+/* 37 */,
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(1);
+__webpack_require__(4);
+module.exports = __webpack_require__(10);
+
+
+/***/ }),
+/* 42 */,
+/* 43 */,
+/* 44 */
+/***/ (function(module, exports) {
+
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function(useSourceMap) {
+	var list = [];
+
+	// return the list of modules as css string
+	list.toString = function toString() {
+		return this.map(function (item) {
+			var content = cssWithMappingToString(item, useSourceMap);
+			if(item[2]) {
+				return "@media " + item[2] + "{" + content + "}";
+			} else {
+				return content;
+			}
+		}).join("");
+	};
+
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+function cssWithMappingToString(item, useSourceMap) {
+	var content = item[1] || '';
+	var cssMapping = item[3];
+	if (!cssMapping) {
+		return content;
+	}
+
+	if (useSourceMap && typeof btoa === 'function') {
+		var sourceMapping = toComment(cssMapping);
+		var sourceURLs = cssMapping.sources.map(function (source) {
+			return '/*# sourceURL=' + cssMapping.sourceRoot + source + ' */'
+		});
+
+		return [content].concat(sourceURLs).concat([sourceMapping]).join('\n');
+	}
+
+	return [content].join('\n');
+}
+
+// Adapted from convert-source-map (MIT)
+function toComment(sourceMap) {
+	// eslint-disable-next-line no-undef
+	var base64 = btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap))));
+	var data = 'sourceMappingURL=data:application/json;charset=utf-8;base64,' + base64;
+
+	return '/*# ' + data + ' */';
+}
+
+
+/***/ }),
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -14291,7 +15508,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(16)
+var listToStyles = __webpack_require__(46)
 
 /*
 type StyleObject = {
@@ -14499,6 +15716,38 @@ function applyToTag (styleElement, obj) {
 }
 
 
-/***/ })
+/***/ }),
+/* 46 */
+/***/ (function(module, exports) {
 
-/******/ });
+/**
+ * Translates the list format produced by css-loader into something
+ * easier to manipulate.
+ */
+module.exports = function listToStyles (parentId, list) {
+  var styles = []
+  var newStyles = {}
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i]
+    var id = item[0]
+    var css = item[1]
+    var media = item[2]
+    var sourceMap = item[3]
+    var part = {
+      id: parentId + ':' + i,
+      css: css,
+      media: media,
+      sourceMap: sourceMap
+    }
+    if (!newStyles[id]) {
+      styles.push(newStyles[id] = { id: id, parts: [part] })
+    } else {
+      newStyles[id].parts.push(part)
+    }
+  }
+  return styles
+}
+
+
+/***/ })
+/******/ ]);
