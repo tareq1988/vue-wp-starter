@@ -7,6 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "cross-env WEBPACK_ENV=development webpack --progress --colors --watch --hide-modules",
+    "dev-build": "cross-env WEBPACK_ENV=development webpack",
     "build": "cross-env WEBPACK_ENV=production webpack"
   },
   "dependencies": {
