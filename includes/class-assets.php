@@ -66,20 +66,25 @@ class Assets {
         $prefix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.min' : '';
 
         $scripts = [
+            'baseplugin-runtime' => [
+                'src'       => BASEPLUGIN_ASSETS . '/js/runtime.js',
+                'version'   => filemtime( BASEPLUGIN_PATH . '/assets/js/runtime.js' ),
+                'in_footer' => true
+            ],
             'baseplugin-vendor' => [
-                'src'       => BASEPLUGIN_ASSETS . '/js/vendor.js',
-                'version'   => filemtime( BASEPLUGIN_PATH . '/assets/js/vendor.js' ),
+                'src'       => BASEPLUGIN_ASSETS . '/js/vendors.js',
+                'version'   => filemtime( BASEPLUGIN_PATH . '/assets/js/vendors.js' ),
                 'in_footer' => true
             ],
             'baseplugin-frontend' => [
                 'src'       => BASEPLUGIN_ASSETS . '/js/frontend.js',
-                'deps'      => [ 'jquery', 'baseplugin-vendor' ],
+                'deps'      => [ 'jquery', 'baseplugin-vendor', 'baseplugin-runtime' ],
                 'version'   => filemtime( BASEPLUGIN_PATH . '/assets/js/frontend.js' ),
                 'in_footer' => true
             ],
             'baseplugin-admin' => [
                 'src'       => BASEPLUGIN_ASSETS . '/js/admin.js',
-                'deps'      => [ 'jquery', 'baseplugin-vendor' ],
+                'deps'      => [ 'jquery', 'baseplugin-vendor', 'baseplugin-runtime' ],
                 'version'   => filemtime( BASEPLUGIN_PATH . '/assets/js/admin.js' ),
                 'in_footer' => true
             ]
