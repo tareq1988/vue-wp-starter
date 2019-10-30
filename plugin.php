@@ -176,23 +176,21 @@ final class Base_Plugin {
      */
     public function includes() {
 
-        require_once BASEPLUGIN_INCLUDES . '/class-assets.php';
+        require_once BASEPLUGIN_INCLUDES . '/Assets.php';
 
         if ( $this->is_request( 'admin' ) ) {
-            require_once BASEPLUGIN_INCLUDES . '/class-admin.php';
+            require_once BASEPLUGIN_INCLUDES . '/Admin.php';
         }
 
         if ( $this->is_request( 'frontend' ) ) {
-            require_once BASEPLUGIN_INCLUDES . '/class-frontend.php';
+            require_once BASEPLUGIN_INCLUDES . '/Frontend.php';
         }
 
         if ( $this->is_request( 'ajax' ) ) {
             // require_once BASEPLUGIN_INCLUDES . '/class-ajax.php';
         }
 
-        if ( $this->is_request( 'rest' ) ) {
-            require_once BASEPLUGIN_INCLUDES . '/class-rest-api.php';
-        }
+        require_once BASEPLUGIN_INCLUDES . '/Api.php';
     }
 
     /**
@@ -227,10 +225,7 @@ final class Base_Plugin {
             // $this->container['ajax'] =  new App\Ajax();
         }
 
-        if ( $this->is_request( 'rest' ) ) {
-            $this->container['rest'] = new App\REST_API();
-        }
-
+        $this->container['api'] = new App\Api();
         $this->container['assets'] = new App\Assets();
     }
 
