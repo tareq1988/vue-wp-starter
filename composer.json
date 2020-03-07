@@ -1,5 +1,5 @@
 {
-    "name": "tareq1988/vue-wp-starter",
+    "name": "kapilpaul/vue-wp-starter",
     "description": "A WordPress Vue.js starter plugin",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
@@ -7,6 +7,10 @@
         {
             "name": "Tareq Hasan",
             "email": "tareq@wedevs.com"
+        },
+        {
+            "name": "Kapil Paul",
+            "email": "kapilpaul007@gmail.com"
         }
     ],
     "minimum-stability": "dev",
