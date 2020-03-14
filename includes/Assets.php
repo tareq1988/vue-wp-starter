@@ -7,10 +7,17 @@ namespace App;
  */
 class Assets
 {
+    /**
+     * Set WP env for debugging and vue js hot load
+     * @var string
+     */
+    protected $WP_ENV = 'dev';
 
+    /**
+     * Assets constructor.
+     */
     function __construct()
     {
-
         if (is_admin()) {
             add_action('admin_enqueue_scripts', [$this, 'register'], 5);
         } else {
@@ -71,9 +78,7 @@ class Assets
     public function get_scripts()
     {
         $prefix = defined('SCRIPT_DEBUG') && SCRIPT_DEBUG ? '.min' : '';
-
-//        $pluginJSAssetsPath = BASEPLUGIN_ASSETS . '/js/';
-        $pluginJSAssetsPath = 'http://localhost:8080/';
+        $pluginJSAssetsPath = ($this->WP_ENV == 'dev') ? 'http://localhost:8080/' : BASEPLUGIN_ASSETS . '/js/';
 
         $scripts = [
             'baseplugin-runtime' => [
@@ -110,16 +115,17 @@ class Assets
      */
     public function get_styles()
     {
+        $pluginJSAssetsPath = ($this->WP_ENV == 'dev') ? 'http://localhost:8080/' : BASEPLUGIN_ASSETS . '/css/';
 
         $styles = [
             'baseplugin-style' => [
-                'src' => BASEPLUGIN_ASSETS . '/css/style.css'
+                'src' => $pluginJSAssetsPath . '/style.css'
             ],
             'baseplugin-frontend' => [
-                'src' => BASEPLUGIN_ASSETS . '/css/frontend.css'
+                'src' => $pluginJSAssetsPath . '/frontend.css'
             ],
             'baseplugin-admin' => [
-                'src' => BASEPLUGIN_ASSETS . '/css/admin.css'
+                'src' => $pluginJSAssetsPath . '/admin.css'
             ],
         ];
 

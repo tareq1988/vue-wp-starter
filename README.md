@@ -27,7 +27,7 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
 1. Replace the PHP namespace `App` with your desired name.
 1. Replace `baseplugin` or `BASEPLUGIN` reference in files.
 1. Run `npm install`
-1. To start developing, run `npm run dev` 🤘
+1. To start developing, run `npm run hot` 🔥 (You need to change the `$WP_ENV` to `dev` in includes/Assets.php for HOT reload)
 1. For production build, run `npm run build` 👍
 
 ## 🎁 Preview
