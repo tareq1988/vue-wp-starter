@@ -41,6 +41,8 @@ Domain Path: /languages
 // don't call the file directly
 if (!defined('ABSPATH')) exit;
 
+require_once __DIR__ . '/vendor/autoload.php';
+
 /**
  * Base_Plugin class
  *
@@ -48,13 +50,12 @@ if (!defined('ABSPATH')) exit;
  */
 final class Base_Plugin
 {
-
     /**
      * Plugin version
      *
      * @var string
      */
-    public $version = '0.1.0';
+    const version = '0.1.0';
 
     /**
      * Holds various class instances
@@ -69,9 +70,8 @@ final class Base_Plugin
      * Sets up all the appropriate hooks and actions
      * within our plugin.
      */
-    public function __construct()
+    private function __construct()
     {
-
         $this->define_constants();
 
         register_activation_hook(__FILE__, array($this, 'activate'));
@@ -85,6 +85,8 @@ final class Base_Plugin
      *
      * Checks for an existing Base_Plugin() instance
      * and if it doesn't find one, creates it.
+     *
+     * @return Base_Plugin|bool
      */
     public static function init()
     {
@@ -132,7 +134,7 @@ final class Base_Plugin
      */
     public function define_constants()
     {
-        define('BASEPLUGIN_VERSION', $this->version);
+        define('BASEPLUGIN_VERSION', self::version);
         define('BASEPLUGIN_FILE', __FILE__);
         define('BASEPLUGIN_PATH', dirname(BASEPLUGIN_FILE));
         define('BASEPLUGIN_INCLUDES', BASEPLUGIN_PATH . '/includes');
@@ -184,21 +186,17 @@ final class Base_Plugin
      */
     public function includes()
     {
-        require_once BASEPLUGIN_INCLUDES . '/Assets.php';
-
         if ($this->is_request('admin')) {
-            require_once BASEPLUGIN_INCLUDES . '/Admin.php';
+            $this->container['admin'] = new Kapil\App\Admin();
         }
 
         if ($this->is_request('frontend')) {
-            require_once BASEPLUGIN_INCLUDES . '/Frontend.php';
+            $this->container['frontend'] = new Kapil\App\Frontend();
         }
 
         if ($this->is_request('ajax')) {
             // require_once BASEPLUGIN_INCLUDES . '/class-ajax.php';
         }
-
-        require_once BASEPLUGIN_INCLUDES . '/Api.php';
     }
 
     /**
@@ -221,20 +219,12 @@ final class Base_Plugin
      */
     public function init_classes()
     {
-        if ($this->is_request('admin')) {
-            $this->container['admin'] = new App\Admin();
-        }
-
-        if ($this->is_request('frontend')) {
-            $this->container['frontend'] = new App\Frontend();
-        }
-
         if ($this->is_request('ajax')) {
-            // $this->container['ajax'] =  new App\Ajax();
+            // $this->container['ajax'] =  new Kapil\App\Ajax();
         }
 
-        $this->container['api'] = new App\Api();
-        $this->container['assets'] = new App\Assets();
+        $this->container['api'] = new Kapil\App\Api();
+        $this->container['assets'] = new Kapil\App\Assets();
     }
 
     /**
@@ -276,4 +266,17 @@ final class Base_Plugin
 
 } // Base_Plugin
 
-$baseplugin = Base_Plugin::init();
+/**
+ * Initialize the main plugin
+ *
+ * @return \Base_Plugin|bool
+ */
+function base_plugin()
+{
+    return Base_Plugin::init();
+}
+
+/**
+ *  kick-off the plugin
+ */
+base_plugin();

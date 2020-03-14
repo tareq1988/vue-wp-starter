@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Kapil\App;
 
 /**
  * Scripts and Styles Class

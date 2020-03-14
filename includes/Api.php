@@ -1,5 +1,5 @@
 <?php
-namespace App;
+namespace Kapil\App;
 
 use WP_REST_Controller;
 

@@ -1,29 +1,25 @@
 <?php
-namespace App;
+/**
+ * Created by PhpStorm.
+ * User: kapilpaul
+ * Date: 14/3/20
+ * Time: 11:54 PM
+ */
+
+namespace Kapil\App;
+
 
 /**
- * Frontend Pages Handler
+ * Class Frontend
+ * @package Kapil\App
  */
-class Frontend {
-
-    public function __construct() {
-        add_shortcode( 'vue-app', [ $this, 'render_frontend' ] );
-    }
-
+class Frontend
+{
     /**
-     * Render frontend app
-     *
-     * @param  array $atts
-     * @param  string $content
-     *
-     * @return string
+     * Frontend constructor.
      */
-    public function render_frontend( $atts, $content = '' ) {
-        wp_enqueue_style( 'baseplugin-frontend' );
-        wp_enqueue_script( 'baseplugin-frontend' );
-
-        $content .= '<div id="vue-frontend-app"></div>';
-
-        return $content;
+    public function __construct()
+    {
+        new Frontend\Shortcode();
     }
 }

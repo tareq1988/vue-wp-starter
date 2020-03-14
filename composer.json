@@ -1,5 +1,5 @@
 {
-    "name": "tareq1988/vue-wp-starter",
+    "name": "kapilpaul/vue-wp-starter",
     "description": "A WordPress Vue.js starter plugin",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
@@ -17,7 +17,7 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "App\\": "includes/"
+            "Kapil\\App\\": "includes/"
         }
     }
 }
