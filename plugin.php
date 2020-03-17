@@ -160,13 +160,8 @@ final class Base_Plugin
      */
     public function activate()
     {
-        $installed = get_option('baseplugin_installed');
-
-        if (!$installed) {
-            update_option('baseplugin_installed', time());
-        }
-
-        update_option('baseplugin_version', BASEPLUGIN_VERSION);
+        $installer = new Kapil\App\Installer();
+        $installer->run();
     }
 
     /**

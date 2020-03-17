@@ -11,7 +11,7 @@ class Assets
      * Set WP env for debugging and vue js hot load
      * @var string
      */
-    protected $WP_ENV = 'dev';
+    protected $WP_ENV = 'prod';
 
     /**
      * Assets constructor.

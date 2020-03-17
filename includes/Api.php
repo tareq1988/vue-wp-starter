@@ -1,4 +1,5 @@
 <?php
+
 namespace Kapil\App;
 
 use WP_REST_Controller;
@@ -6,15 +7,17 @@ use WP_REST_Controller;
 /**
  * REST_API Handler
  */
-class Api extends WP_REST_Controller {
+class Api extends WP_REST_Controller
+{
 
     /**
      * [__construct description]
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->includes();
 
-        add_action( 'rest_api_init', [ $this, 'register_routes' ] );
+        add_action('rest_api_init', [$this, 'register_routes']);
     }
 
     /**
@@ -22,8 +25,9 @@ class Api extends WP_REST_Controller {
      *
      * @return void
      */
-    private function includes() {
-        if ( !class_exists( __NAMESPACE__ . '\Api\Example'  ) ) {
+    private function includes()
+    {
+        if (!class_exists(__NAMESPACE__ . '\Api\Example')) {
             require_once __DIR__ . '/Api/Example.php';
         }
     }
@@ -33,7 +37,8 @@ class Api extends WP_REST_Controller {
      *
      * @return void
      */
-    public function register_routes() {
+    public function register_routes()
+    {
         (new Api\Example())->register_routes();
     }
 
