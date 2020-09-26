@@ -3,6 +3,7 @@ const path = require('path');
 const package = require('./package.json');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -22,11 +23,6 @@ var exportPath = path.resolve(__dirname, './assets/js');
 
 // Enviroment flag
 var plugins = [];
-var env = process.env.NODE_ENV;
-
-function isProduction() {
-  return process.env.NODE_ENV === 'production';
-}
 
 // extract css into its own file
 plugins.push(new MiniCssExtractPlugin({
@@ -34,6 +30,10 @@ plugins.push(new MiniCssExtractPlugin({
   ignoreOrder: false, // Enable to remove warnings about conflicting order
 }));
 
+// enable live reload with browser-sync
+// set your WordPress site URL in config.json
+// file and uncomment the snippet below.
+// --------------------------------------
 // plugins.push(new BrowserSyncPlugin( {
 //   proxy: {
 //     target: config.proxyURL
