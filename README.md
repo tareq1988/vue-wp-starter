@@ -43,3 +43,6 @@ A WordPress [Vue.js](https://vuejs.org/) starter plugin with required toolbelts 
 Made by [Tareq Hasan](https://github.com/tareq1988) from [weDevs](https://wedevs.com).
 
 *Found anything that can be improved? You are welcome to contribute.*
+
+## Errors
+If you run into build errors when running `npm run dev` make sure using node v12.16.1 and npm 6.13.4 or higher
