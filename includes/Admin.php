@@ -24,8 +24,11 @@ class Admin {
         $hook = add_menu_page( __( 'Vue App', 'textdomain' ), __( 'Vue App', 'textdomain' ), $capability, $slug, [ $this, 'plugin_page' ], 'dashicons-text' );
 
         if ( current_user_can( $capability ) ) {
-            $submenu[ $slug ][] = array( __( 'App', 'textdomain' ), $capability, 'admin.php?page=' . $slug . '#/' );
-            $submenu[ $slug ][] = array( __( 'Settings', 'textdomain' ), $capability, 'admin.php?page=' . $slug . '#/settings' );
+            add_submenu_page( $slug, __( 'App', 'textdomain' ), __( 'App', 'textdomain'), $capability, 'admin.php?page=' . $slug . '#/' );
+            add_submenu_page( $slug, __( 'Settings', 'textdomain' ), __( 'Settings', 'textdomain'), $capability, 'admin.php?page=' . $slug . '#/settings' );
+
+            global $submenu;
+            unset( $submenu[ $slug ][0] );
         }
 
         add_action( 'load-' . $hook, [ $this, 'init_hooks'] );
