@@ -140,7 +140,6 @@ final class Base_Plugin {
      * @return void
      */
     public function init_plugin() {
-        $this->includes();
         $this->init_hooks();
     }
 
@@ -199,6 +198,8 @@ final class Base_Plugin {
      * @return void
      */
     public function init_hooks() {
+
+        add_action( 'init', array( $this, 'includes') );
 
         add_action( 'init', array( $this, 'init_classes' ) );
 
