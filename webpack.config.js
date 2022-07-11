@@ -16,7 +16,7 @@ var appName = 'app';
 var entryPoint = {
   frontend: './src/frontend/main.js',
   admin: './src/admin/main.js',
-  style: './assets/less/style.less',
+  style: ['./assets/less/style.less', './assets/scss/style.scss'],
 };
 
 var exportPath = path.resolve(__dirname, './assets/js');
@@ -108,6 +108,14 @@ module.exports = {
           'vue-style-loader',
           'css-loader',
           'less-loader'
+        ]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          'sass-loader'
         ]
       },
       {
